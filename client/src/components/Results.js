@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import KanjiDisplay from './KanjiDisplay';
 
 const Results = () => {
   const location = useLocation();
@@ -47,7 +48,7 @@ const Results = () => {
             <div className="result-list">
               {incorrectResults.map((item, index) => (
                 <div key={index} className="result-item incorrect">
-                  <div className="result-character">{item.character}</div>
+                  <KanjiDisplay character={item.character} />
                   <div className="result-details">
                     <div><strong>Meaning:</strong> {item.meaning}</div>
                     <div><strong>Grade:</strong> {item.grade}</div>

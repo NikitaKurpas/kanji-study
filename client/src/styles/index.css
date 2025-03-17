@@ -145,6 +145,25 @@ select {
   font-size: 5rem;
   line-height: 1.2;
   margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.kanji-character.system-font {
+  font-size: 5rem;
+}
+
+.kanji-svg {
+  height: 150px;
+  width: 150px;
+  object-fit: contain;
+}
+
+.kanji-svg-result {
+  height: 60px;
+  width: 60px;
+  object-fit: contain;
 }
 
 .kanji-meaning {
@@ -259,6 +278,9 @@ select {
   margin-right: 1rem;
   width: 80px;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .result-details {
@@ -318,6 +340,11 @@ select {
   
   .kanji-character {
     font-size: 4rem;
+  }
+  
+  .kanji-svg {
+    height: 120px;
+    width: 120px;
   }
   
   .quiz-controls {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import KanjiDisplay from "./KanjiDisplay";
 
 const Quiz = () => {
   const location = useLocation();
@@ -120,13 +121,11 @@ const Quiz = () => {
           {mode === "meaning-to-kanji" ? (
             <>
               <div className="kanji-meaning">{currentKanji.meaning}</div>
-              {revealed ? (
-                <div className="kanji-character">{currentKanji.character}</div>
-              ) : null}
+              {revealed && <KanjiDisplay character={currentKanji.character} />}
             </>
           ) : (
             <>
-              <div className="kanji-character">{currentKanji.character}</div>
+              <KanjiDisplay character={currentKanji.character} />
               {revealed ? (
                 <div className="kanji-meaning">{currentKanji.meaning}</div>
               ) : null}
