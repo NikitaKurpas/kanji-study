@@ -27,14 +27,14 @@ const getKanjiByGrades = (grades) => {
 const getKanjiForReview = (grades, limit, mode) => {
   return new Promise((resolve, reject) => {
     const placeholders = grades.map(() => '?').join(',');
-    
+
     // We prioritize kanji with lower levels and those that haven't been reviewed recently
     // We use a weighted random selection influenced by the level
     const query = `
-      SELECT * FROM kanji 
+      SELECT * FROM kanji
       WHERE grade IN (${placeholders})
       ORDER BY 
-        (level * 0.6) + 
+        (level * 0.6) - 
         (CASE 
           WHEN last_reviewed IS NULL THEN 0
           ELSE (julianday('now') - julianday(last_reviewed)) * 0.4
