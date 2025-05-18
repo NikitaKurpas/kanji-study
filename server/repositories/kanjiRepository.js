@@ -34,10 +34,10 @@ const getKanjiForReview = (grades, limit, mode) => {
       SELECT * FROM kanji
       WHERE grade IN (${placeholders})
       ORDER BY 
-        (level * 0.6) - 
+        (level * 2) - 
         (CASE 
-          WHEN last_reviewed IS NULL THEN 0
-          ELSE (julianday('now') - julianday(last_reviewed)) * 0.4
+          WHEN last_reviewed IS NULL THEN 1
+          ELSE (julianday('now') - julianday(last_reviewed)) * 0.5
         END) ASC,
         RANDOM()
       LIMIT ?
