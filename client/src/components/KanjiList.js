@@ -5,6 +5,7 @@ const KanjiList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [reviewFilter, setReviewFilter] = useState('all');
   const [selectedGrades, setSelectedGrades] = useState([1, 2, 3, 4, 5]);
   
   useEffect(() => {
@@ -53,6 +54,47 @@ const KanjiList = () => {
       filtered = filtered.filter(kanji => kanji.level === 5);
     }
     
+    // Filter by review history
+    if (reviewFilter === 'never') {
+      filtered = filtered.filter(kanji => kanji.last_reviewed === null);
+    } else if (reviewFilter === 'last24h') {
+      const oneDayAgo = new Date();
+      oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+      filtered = filtered.filter(kanji => {
+        if (!kanji.last_reviewed) return false;
+        const reviewDate = new Date(kanji.last_reviewed);
+        return reviewDate >= oneDayAgo;
+      });
+    } else if (reviewFilter === 'day-to-week') {
+      const oneDayAgo = new Date();
+      oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      filtered = filtered.filter(kanji => {
+        if (!kanji.last_reviewed) return false;
+        const reviewDate = new Date(kanji.last_reviewed);
+        return reviewDate < oneDayAgo && reviewDate >= oneWeekAgo;
+      });
+    } else if (reviewFilter === 'week-to-month') {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
+      filtered = filtered.filter(kanji => {
+        if (!kanji.last_reviewed) return false;
+        const reviewDate = new Date(kanji.last_reviewed);
+        return reviewDate < oneWeekAgo && reviewDate >= oneMonthAgo;
+      });
+    } else if (reviewFilter === 'older') {
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
+      filtered = filtered.filter(kanji => {
+        if (!kanji.last_reviewed) return false;
+        const reviewDate = new Date(kanji.last_reviewed);
+        return reviewDate < oneMonthAgo;
+      });
+    }
+    
     return filtered;
   };
   
@@ -84,6 +126,22 @@ const KanjiList = () => {
                 <option value="unlearned">Unlearned (Level 0)</option>
                 <option value="learning">Learning (Level 1-4)</option>
                 <option value="mastered">Mastered (Level 5)</option>
+              </select>
+            </div>
+            
+            <div className="form-group" style={{ flex: 1 }}>
+              <label htmlFor="reviewFilter">Filter by Review History:</label>
+              <select 
+                id="reviewFilter"
+                value={reviewFilter}
+                onChange={(e) => setReviewFilter(e.target.value)}
+              >
+                <option value="all">All Kanji</option>
+                <option value="never">Never Reviewed</option>
+                <option value="last24h">Reviewed within Last 24h</option>
+                <option value="day-to-week">Reviewed 1 Day to 1 Week Ago</option>
+                <option value="week-to-month">Reviewed 1 Week to 1 Month Ago</option>
+                <option value="older">Reviewed More Than 1 Month Ago</option>
               </select>
             </div>
           </div>
