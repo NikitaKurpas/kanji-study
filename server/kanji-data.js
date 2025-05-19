@@ -96,7 +96,7 @@ const grade2Kanji = [
   { c: "歌", m: "song" },
   { c: "画", m: "picture" },
   { c: "回", m: "-times, round, revolve, counter for occurrences" },
-  { c: "会", m: "meeting" },
+  { c: "会", m: "meeting, meet" },
   { c: "海", m: "sea" },
   { c: "絵", m: "picture, drawing, painting" },
   { c: "外", m: "outside" },
