@@ -49,8 +49,17 @@ const Study = () => {
         {error && <div className="error">{error}</div>}
         
         <div className="form-group">
-          <label>Select Kanji Grade Levels:</label>
+          <label>Select Study Content:</label>
           <div className="grade-selector">
+            <div className="grade-checkbox">
+              <input
+                type="checkbox"
+                id="grade-0"
+                checked={selectedGrades.includes(0)}
+                onChange={() => handleGradeChange(0)}
+              />
+              <label htmlFor="grade-0">Kana</label>
+            </div>
             {[1, 2, 3, 4, 5].map(grade => (
               <div key={grade} className="grade-checkbox">
                 <input

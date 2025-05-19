@@ -6,7 +6,7 @@ const KanjiList = () => {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
   const [reviewFilter, setReviewFilter] = useState('all');
-  const [selectedGrades, setSelectedGrades] = useState([1, 2, 3, 4, 5]);
+  const [selectedGrades, setSelectedGrades] = useState([0, 1, 2, 3, 4, 5]);
   
   useEffect(() => {
     const fetchKanji = async () => {
@@ -41,7 +41,7 @@ const KanjiList = () => {
     let filtered = kanjiList;
     
     // Filter by grade
-    if (selectedGrades.length > 0 && selectedGrades.length < 5) {
+    if (selectedGrades.length > 0 && selectedGrades.length < 6) {
       filtered = filtered.filter(kanji => selectedGrades.includes(kanji.grade));
     }
     
@@ -149,6 +149,15 @@ const KanjiList = () => {
           <div className="form-group">
             <label>Filter by Grade:</label>
             <div className="grade-selector">
+              <div className="grade-checkbox">
+                <input
+                  type="checkbox"
+                  id="list-grade-0"
+                  checked={selectedGrades.includes(0)}
+                  onChange={() => handleGradeChange(0)}
+                />
+                <label htmlFor="list-grade-0">Kana</label>
+              </div>
               {[1, 2, 3, 4, 5].map(grade => (
                 <div key={grade} className="grade-checkbox">
                   <input
@@ -165,14 +174,14 @@ const KanjiList = () => {
         </div>
         
         <div>
-          <p>Showing {filteredKanji.length} kanji</p>
+          <p>Showing {filteredKanji.length} characters</p>
           
           <div className="kanji-grid">
             {filteredKanji.map(kanji => (
               <div key={kanji.id} className="kanji-item">
                 <div className="character">{kanji.character}</div>
                 <div className="meaning">{kanji.meaning}</div>
-                <div className="grade">Grade {kanji.grade}</div>
+                <div className="grade">{kanji.grade === 0 ? 'Kana' : `Grade ${kanji.grade}`}</div>
                 <div className="level-indicator">
                   {[...Array(5)].map((_, i) => (
                     <div 

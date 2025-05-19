@@ -90,13 +90,17 @@ const getKanjiStats = () => {
     const query = `
       SELECT 
         COUNT(*) as total_kanji,
+        SUM(CASE WHEN grade = 0 THEN 1 ELSE 0 END) as total_kana,
+        SUM(CASE WHEN grade > 0 THEN 1 ELSE 0 END) as total_kanji_only,
         SUM(CASE WHEN level = 0 THEN 1 ELSE 0 END) as level_0,
         SUM(CASE WHEN level = 1 THEN 1 ELSE 0 END) as level_1,
         SUM(CASE WHEN level = 2 THEN 1 ELSE 0 END) as level_2,
         SUM(CASE WHEN level = 3 THEN 1 ELSE 0 END) as level_3,
         SUM(CASE WHEN level = 4 THEN 1 ELSE 0 END) as level_4,
         SUM(CASE WHEN level = 5 THEN 1 ELSE 0 END) as level_5,
-        COUNT(DISTINCT CASE WHEN last_reviewed IS NOT NULL THEN id END) as studied_kanji,
+        COUNT(DISTINCT CASE WHEN last_reviewed IS NOT NULL AND grade = 0 THEN id END) as studied_kana,
+        COUNT(DISTINCT CASE WHEN last_reviewed IS NOT NULL AND grade > 0 THEN id END) as studied_kanji,
+        COUNT(DISTINCT CASE WHEN last_reviewed IS NOT NULL THEN id END) as studied_total,
         (SELECT COUNT(*) FROM review_history WHERE item_type = 'kanji') as total_reviews,
         (SELECT COUNT(*) FROM review_history WHERE item_type = 'kanji' AND result = 1) as correct_reviews
       FROM kanji

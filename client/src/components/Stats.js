@@ -41,13 +41,23 @@ const Stats = () => {
         
         <div className="stats-grid">
           <div className="stat-item">
-            <div className="stat-value">{stats.total_kanji}</div>
+            <div className="stat-value">{stats.total_kanji_only}</div>
             <div className="stat-label">Total Kanji</div>
+          </div>
+          
+          <div className="stat-item">
+            <div className="stat-value">{stats.total_kana}</div>
+            <div className="stat-label">Total Kana</div>
           </div>
           
           <div className="stat-item">
             <div className="stat-value">{stats.studied_kanji}</div>
             <div className="stat-label">Kanji Studied</div>
+          </div>
+          
+          <div className="stat-item">
+            <div className="stat-value">{stats.studied_kana}</div>
+            <div className="stat-label">Kana Studied</div>
           </div>
           
           <div className="stat-item">
@@ -63,7 +73,7 @@ const Stats = () => {
       </div>
       
       <div className="card">
-        <h2>Kanji by Level</h2>
+        <h2>Kana/Kanji by Level</h2>
         
         <div className="stats-grid">
           <div className="stat-item">
