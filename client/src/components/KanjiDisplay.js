@@ -11,6 +11,8 @@ const KanjiDisplay = ({ character }) => {
   const [imgError, setImgError] = useState(false);
   const svgPath = `/kanji/${kanjiToHex(character)}.svg`;
 
+  // TODO: display kana from https://github.com/zhengkyl/strokesvg
+
   return imgError ? (
     <div className="kanji-character system-font">{character}</div>
   ) : (
