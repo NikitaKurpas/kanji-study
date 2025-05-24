@@ -1,6 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const { parseKanjiData } = require('./kanji-data');
+const { parseWordData } = require('./word-data');
 
 const db = new sqlite3.Database(path.join(__dirname, 'kanji.db'));
 
@@ -20,7 +21,7 @@ const initDB = () => {
       )
     `);
 
-    // Create words table (for future expansion)
+    // Create words table
     db.run(`
       CREATE TABLE IF NOT EXISTS words (
         id INTEGER PRIMARY KEY,
@@ -93,10 +94,53 @@ const insertSampleData = () => {
   });
 };
 
+// Insert or update word data
+const insertWordData = () => {
+  // Returns an array of words in the format:
+  // { word: <言葉>, reading: <word reading>, meaning: <word meaning> }
+  const allWords = parseWordData();
+
+  // Use a transaction for better performance
+  db.serialize(() => {
+    db.run('BEGIN TRANSACTION');
+    
+    // First insert all new words
+    const insertWord = db.prepare('INSERT OR IGNORE INTO words (word, reading, meaning) VALUES (?, ?, ?)');
+    
+    allWords.forEach(word => {
+      // Handle reading array (some words have multiple readings)
+      const reading = Array.isArray(word.reading) ? word.reading.join(', ') : word.reading;
+      
+      insertWord.run([word.word, reading, word.meaning], (err) => {
+        if (err) console.error('Error inserting word:', err, word);
+      });
+    });
+    
+    insertWord.finalize();
+    
+    // Then update meanings for all words
+    const updateWord = db.prepare('UPDATE words SET meaning = ?, reading = ? WHERE word = ?');
+    
+    allWords.forEach(word => {
+      // Handle reading array (some words have multiple readings)
+      const reading = Array.isArray(word.reading) ? word.reading.join(', ') : word.reading;
+      
+      updateWord.run([word.meaning, reading, word.word], (err) => {
+        if (err) console.error('Error updating word:', err, word);
+      });
+    });
+    
+    updateWord.finalize();
+    
+    db.run('COMMIT');
+  });
+};
+
 // Initialize DB with sample data
 const initialize = () => {
   initDB();
   insertSampleData();
+  insertWordData();
 };
 
 module.exports = {

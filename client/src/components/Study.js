@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Study = () => {
@@ -6,8 +6,21 @@ const Study = () => {
   const [selectedGrades, setSelectedGrades] = useState([1, 2]);
   const [limit, setLimit] = useState(10);
   const [mode, setMode] = useState('meaning-to-kanji');
+  const [studyType, setStudyType] = useState('kanji');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (studyType === 'kanji') {
+      setSelectedGrades([1, 2]);
+      setLimit(10);
+      setMode('meaning-to-kanji');
+    } else if (studyType === 'words') {
+      setSelectedGrades([]);
+      setLimit(10);
+      setMode('meaning-to-word');
+    }
+  }, [studyType])
 
   const handleGradeChange = (grade) => {
     if (selectedGrades.includes(grade)) {
@@ -18,7 +31,7 @@ const Study = () => {
   };
 
   const handleStartStudy = async () => {
-    if (selectedGrades.length === 0) {
+    if (studyType === 'kanji' && selectedGrades.length === 0) {
       setError('Please select at least one grade level.');
       return;
     }
@@ -30,6 +43,7 @@ const Study = () => {
       // Navigate to quiz page with selected parameters
       navigate(`/quiz`, { 
         state: { 
+          studyType,
           grades: selectedGrades, 
           limit: limit, 
           mode: mode 
@@ -41,6 +55,34 @@ const Study = () => {
     }
   };
 
+  const getStudyModes = () => {
+    if (studyType === 'kanji') {
+      return (
+        <select
+          id="mode"
+          value={mode}
+          onChange={(e) => setMode(e.target.value)}
+        >
+          <option value="meaning-to-kanji">Meaning to Kanji</option>
+          <option value="kanji-to-meaning">Kanji to Meaning</option>
+        </select>
+      );
+    } else if (studyType === 'words') {
+      return (
+        <select
+          id="mode"
+          value={mode}
+          onChange={(e) => setMode(e.target.value)}
+        >
+          <option value="reading-to-word">Reading to Word</option>
+          <option value="word-to-reading">Word to Reading</option>
+          <option value="meaning-to-word">Meaning to Word</option>
+          <option value="word-to-meaning">Word to Meaning</option>
+        </select>
+      );
+    }
+  };
+
   return (
     <div>
       <div className="card">
@@ -49,33 +91,63 @@ const Study = () => {
         {error && <div className="error">{error}</div>}
         
         <div className="form-group">
-          <label>Select Study Content:</label>
-          <div className="grade-selector">
-            <div className="grade-checkbox">
+          <label htmlFor="studyType">What would you like to study?</label>
+          <div className="radio-group">
+            <div className="radio-item">
               <input
-                type="checkbox"
-                id="grade-0"
-                checked={selectedGrades.includes(0)}
-                onChange={() => handleGradeChange(0)}
+                type="radio"
+                id="study-kanji"
+                name="study-type"
+                value="kanji"
+                checked={studyType === 'kanji'}
+                onChange={() => setStudyType('kanji')}
               />
-              <label htmlFor="grade-0">Kana</label>
+              <label htmlFor="study-kanji">Kanji</label>
             </div>
-            {[1, 2, 3, 4, 5].map(grade => (
-              <div key={grade} className="grade-checkbox">
-                <input
-                  type="checkbox"
-                  id={`grade-${grade}`}
-                  checked={selectedGrades.includes(grade)}
-                  onChange={() => handleGradeChange(grade)}
-                />
-                <label htmlFor={`grade-${grade}`}>Grade {grade}</label>
-              </div>
-            ))}
+            <div className="radio-item">
+              <input
+                type="radio"
+                id="study-words"
+                name="study-type"
+                value="words"
+                checked={studyType === 'words'}
+                onChange={() => setStudyType('words')}
+              />
+              <label htmlFor="study-words">Words</label>
+            </div>
           </div>
         </div>
         
+        {studyType === 'kanji' && (
+          <div className="form-group">
+            <label>Select Kanji Grades:</label>
+            <div className="grade-selector">
+              <div className="grade-checkbox">
+                <input
+                  type="checkbox"
+                  id="grade-0"
+                  checked={selectedGrades.includes(0)}
+                  onChange={() => handleGradeChange(0)}
+                />
+                <label htmlFor="grade-0">Kana</label>
+              </div>
+              {[1, 2, 3, 4, 5].map(grade => (
+                <div key={grade} className="grade-checkbox">
+                  <input
+                    type="checkbox"
+                    id={`grade-${grade}`}
+                    checked={selectedGrades.includes(grade)}
+                    onChange={() => handleGradeChange(grade)}
+                  />
+                  <label htmlFor={`grade-${grade}`}>Grade {grade}</label>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
         <div className="form-group">
-          <label htmlFor="limit">Number of Kanji to Study:</label>
+          <label htmlFor="limit">Number of Items to Study:</label>
           <input
             type="number"
             id="limit"
@@ -88,14 +160,7 @@ const Study = () => {
         
         <div className="form-group">
           <label htmlFor="mode">Study Mode:</label>
-          <select
-            id="mode"
-            value={mode}
-            onChange={(e) => setMode(e.target.value)}
-          >
-            <option value="meaning-to-kanji">Meaning to Kanji</option>
-            <option value="kanji-to-meaning">Kanji to Meaning</option>
-          </select>
+          {getStudyModes()}
         </div>
         
         <button onClick={handleStartStudy} disabled={loading}>

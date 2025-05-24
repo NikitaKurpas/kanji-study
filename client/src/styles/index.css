@@ -98,6 +98,7 @@ button.incorrect:hover {
 }
 
 button.reveal {
+  /* margin-top: 1rem; */
   background-color: #f39c12;
 }
 
@@ -126,6 +127,19 @@ select {
   font-weight: 500;
 }
 
+.radio-group {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+}
+
+.radio-item {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
 .card {
   background-color: white;
   border-radius: 8px;
@@ -134,11 +148,18 @@ select {
   margin-bottom: 1.5rem;
 }
 
-.kanji-card {
+.kanji-card, .word-card {
   text-align: center;
   padding: 2rem;
   margin: 1rem auto;
+}
+
+.kanji-card {
   max-width: 300px;
+}
+
+.word-card {
+  max-width: 400px;
 }
 
 .kanji-character {
@@ -171,10 +192,29 @@ select {
   margin-bottom: 1.5rem;
 }
 
+.word-meaning.front, .word-reading.front, .word-text.front {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.word-meaning {
+  font-size: 2rem;
+}
+
+.word-reading, .word-text {
+  font-size: 3rem;
+}
+
+.word-meaning.secondary, .word-reading.secondary, .word-text.secondary {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
 .quiz-controls {
+  max-width: 300px;
   display: flex;
   justify-content: space-between;
-  margin-top: 2rem;
+  margin: auto;
 }
 
 .grade-selector {
@@ -197,14 +237,21 @@ select {
   margin-right: 0.5rem;
 }
 
-.kanji-grid {
+.kanji-grid, .word-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 1rem;
   margin: 1rem 0;
 }
 
-.kanji-item {
+.kanji-grid {
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+}
+
+.word-grid {
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}
+
+.kanji-item, .word-item {
   background-color: white;
   border-radius: 4px;
   padding: 1rem;
@@ -217,7 +264,7 @@ select {
   margin-bottom: 0.5rem;
 }
 
-.kanji-item .meaning {
+.kanji-item .meaning, .word-item .reading, .word-item .meaning {
   font-size: 0.8rem;
   color: #666;
 }
@@ -229,6 +276,14 @@ select {
   border-radius: 2px;
   margin-top: 0.5rem;
   display: inline-block;
+}
+
+.word-item .word {
+  font-size: 1.5rem;
+}
+
+.word-item .reading {
+  margin-bottom: 0.5rem;
 }
 
 .level-indicator {
@@ -281,6 +336,11 @@ select {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.result-item .word-display {
+  font-size: 2rem;
+  min-width: 8ch;
 }
 
 .result-details {
@@ -359,5 +419,9 @@ select {
   
   .kanji-grid {
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+
+  .word-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
 }

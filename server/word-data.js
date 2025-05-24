@@ -114,3 +114,9 @@ const words = [
     { w: "駅", r: "えき", m: "station" },
     { w: "車", r: "くるま", m: "car" }
 ]
+
+const parseWordData = () => words.map((word) => ({ word: word.w, reading: word.r, meaning: word.m }));;
+
+module.exports = {
+  parseWordData,
+};

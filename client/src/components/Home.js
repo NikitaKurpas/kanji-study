@@ -44,18 +44,23 @@ const Home = () => {
         
         <div className="stats-grid" style={{ marginTop: '2rem' }}>
           <div className="stat-item">
-            <div className="stat-value">{stats?.studied_kanji || 0}</div>
+            <div className="stat-value">{stats?.kanji.studied_kanji || 0}</div>
             <div className="stat-label">Kanji Studied</div>
+          </div>
+
+          <div className="stat-item">
+            <div className="stat-value">{stats?.words.studied_words || 0}</div>
+            <div className="stat-label">Words Studied</div>
           </div>
           
           <div className="stat-item">
-            <div className="stat-value">{stats?.total_reviews || 0}</div>
+            <div className="stat-value">{(stats?.kanji.total_reviews || 0) + (stats?.words.total_reviews || 0)}</div>
             <div className="stat-label">Total Reviews</div>
           </div>
           
           <div className="stat-item">
-            <div className="stat-value">{stats?.accuracy || 0}%</div>
-            <div className="stat-label">Accuracy</div>
+            <div className="stat-value">{stats?.kanji.accuracy || 0}%</div>
+            <div className="stat-label">Kanji Accuracy</div>
           </div>
         </div>
       </div>
@@ -71,6 +76,9 @@ const Home = () => {
           
           <Link to="/kanji">
             <button className="secondary">Browse Kanji</button>
+          </Link>
+          <Link to="/words">
+            <button className="secondary">Browse Words</button>
           </Link>
         </div>
       </div>
