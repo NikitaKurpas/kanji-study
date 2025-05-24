@@ -10,6 +10,16 @@ const getAllWords = () => {
   });
 };
 
+// Get a single word by ID
+const getWordById = (wordId) => {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT * FROM words WHERE id = ?', [wordId], (err, row) => {
+      if (err) return reject(err);
+      resolve(row);
+    });
+  });
+};
+
 // Get words for review based on limit
 const getWordsForReview = (limit, mode) => {
   return new Promise((resolve, reject) => {
@@ -31,6 +41,40 @@ const getWordsForReview = (limit, mode) => {
       if (err) return reject(err);
       resolve(rows);
     });
+  });
+};
+
+// Add a new word
+const addWord = (word, reading, meaning) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      'INSERT INTO words (word, reading, meaning, level, review_count) VALUES (?, ?, ?, 0, 0)',
+      [word, reading, meaning],
+      function(err) {
+        if (err) return reject(err);
+        resolve({ id: this.lastID, word, reading, meaning, level: 0, review_count: 0 });
+      }
+    );
+  });
+};
+
+// Update an existing word
+const updateWord = (wordId, word, reading, meaning) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      'UPDATE words SET word = ?, reading = ?, meaning = ? WHERE id = ?',
+      [word, reading, meaning, wordId],
+      function(err) {
+        if (err) return reject(err);
+        
+        // If successful, return the updated word
+        if (this.changes > 0) {
+          resolve({ id: wordId, word, reading, meaning });
+        } else {
+          reject(new Error('Word not found or no changes made'));
+        }
+      }
+    );
   });
 };
 
@@ -104,7 +148,10 @@ const getWordStats = () => {
 
 module.exports = {
   getAllWords,
+  getWordById,
   getWordsForReview,
+  addWord,
+  updateWord,
   updateWordLevel,
   getWordStats
 };

@@ -107,6 +107,61 @@ app.get('/api/words/review', async (req, res) => {
   }
 });
 
+// Get a single word by ID
+app.get('/api/words/:id', async (req, res) => {
+  try {
+    const wordId = parseInt(req.params.id);
+    if (isNaN(wordId)) {
+      return res.status(400).json({ error: 'Invalid word ID' });
+    }
+
+    const word = await wordRepository.getWordById(wordId);
+    if (!word) {
+      return res.status(404).json({ error: 'Word not found' });
+    }
+    
+    res.json(word);
+  } catch (error) {
+    console.error('Error fetching word:', error);
+    res.status(500).json({ error: 'Failed to fetch word' });
+  }
+});
+
+// Add a new word
+app.post('/api/words', async (req, res) => {
+  try {
+    const { word, reading, meaning } = req.body;
+    
+    if (!word || !reading || !meaning) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
+    
+    const result = await wordRepository.addWord(word, reading, meaning);
+    res.status(201).json(result);
+  } catch (error) {
+    console.error('Error adding word:', error);
+    res.status(500).json({ error: 'Failed to add word' });
+  }
+});
+
+// Update an existing word
+app.put('/api/words/:id', async (req, res) => {
+  try {
+    const wordId = parseInt(req.params.id);
+    const { word, reading, meaning } = req.body;
+    
+    if (isNaN(wordId) || !word || !reading || !meaning) {
+      return res.status(400).json({ error: 'Missing or invalid parameters' });
+    }
+    
+    const result = await wordRepository.updateWord(wordId, word, reading, meaning);
+    res.json(result);
+  } catch (error) {
+    console.error('Error updating word:', error);
+    res.status(500).json({ error: error.message || 'Failed to update word' });
+  }
+});
+
 // Update word level after review
 app.post('/api/words/update-level', async (req, res) => {
   try {

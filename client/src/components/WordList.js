@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const WordList = () => {
   const [wordList, setWordList] = useState([]);
@@ -7,6 +8,7 @@ const WordList = () => {
   const [filter, setFilter] = useState('all');
   const [reviewFilter, setReviewFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
   
   useEffect(() => {
     const fetchWords = async () => {
@@ -95,6 +97,10 @@ const WordList = () => {
     return filtered;
   };
   
+  const handleEditWord = (wordId) => {
+    navigate(`/words/edit/${wordId}`);
+  };
+  
   if (loading) {
     return <div className="loading">Loading word list...</div>;
   }
@@ -108,7 +114,10 @@ const WordList = () => {
   return (
     <div>
       <div className="card">
-        <h2>Words List</h2>
+        <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2>Words List</h2>
+          <Link to="/words/add" className="btn-primary">Add New Word</Link>
+        </div>
         
         <div style={{ marginBottom: '1rem' }}>
           <div style={{ display: 'flex', marginBottom: '1rem' }}>
@@ -161,7 +170,12 @@ const WordList = () => {
           
           <div className="word-grid">
             {filteredWords.map(word => (
-              <div key={word.id} className="word-item">
+              <div 
+                key={word.id} 
+                className="word-item" 
+                onClick={() => handleEditWord(word.id)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="word">{word.word}</div>
                 <div className="reading">{word.reading}</div>
                 <div className="meaning">{word.meaning}</div>

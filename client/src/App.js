@@ -7,6 +7,7 @@ import Study from './components/Study';
 import Quiz from './components/Quiz';
 import KanjiList from './components/KanjiList';
 import WordList from './components/WordList';
+import WordForm from './components/WordForm';
 import Stats from './components/Stats';
 import Results from './components/Results';
 
@@ -34,6 +35,8 @@ function App() {
           <Route path="/quiz" element={<Quiz />} />
           <Route path="/kanji" element={<KanjiList />} />
           <Route path="/words" element={<WordList />} />
+          <Route path="/words/add" element={<WordForm />} />
+          <Route path="/words/edit/:id" element={<WordForm />} />
           <Route path="/stats" element={<Stats />} />
           <Route path="/results" element={<Results />} />
         </Routes>
