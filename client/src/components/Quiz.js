@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import KanjiDisplay from "./KanjiDisplay";
+import WordDisplay from "./WordDisplay";
 
 const Quiz = () => {
   const location = useLocation();
@@ -178,12 +179,12 @@ const WordCard = ({ item, mode, revealed, onReveal: handleReveal }) => {
     questionContent = <div className="word-reading front">{item.reading}</div>;
     answerContent = (
       <div>
-        <div className="word-text">{item.word}</div>
+        <WordDisplay word={item.word} />
         <div className="word-meaning secondary">{item.meaning}</div>
       </div>
     );
   } else if (mode === "word-to-reading") {
-    questionContent = <div className="word-text front">{item.word}</div>;
+    questionContent = <WordDisplay word={item.word} />;
     answerContent = (
       <div>
         <div className="word-reading">{item.reading}</div>
@@ -194,12 +195,12 @@ const WordCard = ({ item, mode, revealed, onReveal: handleReveal }) => {
     questionContent = <div className="word-meaning front">{item.meaning}</div>;
     answerContent = (
       <div>
-        <div className="word-text">{item.word}</div>
+        <WordDisplay word={item.word} />
         <div className="word-reading secondary">{item.reading}</div>
       </div>
     );
   } else if (mode === "word-to-meaning") {
-    questionContent = <div className="word-text front">{item.word}</div>;
+    questionContent = <WordDisplay word={item.word} />;
     answerContent = (
       <div>
         <div className="word-meaning">{item.meaning}</div>

@@ -1,6 +1,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import KanjiDisplay from "./KanjiDisplay";
+import WordDisplay from "./WordDisplay";
 
 const Results = () => {
   const location = useLocation();
@@ -103,7 +104,7 @@ const IncorrectWordItems = ({ items }) => {
     <div className="result-list">
       {items.map((item, index) => (
         <div key={index} className="result-item incorrect">
-          <div className="word-display">{item.word}</div>
+          <WordDisplay word={item.word} />
           <div className="result-details">
             <div>
               <strong>Reading:</strong> {item.reading}

@@ -175,6 +175,10 @@ select {
   font-size: 5rem;
 }
 
+.word-character-display .kanji-character {
+  display: inline-block;
+}
+
 .kanji-svg {
   height: 150px;
   width: 150px;
