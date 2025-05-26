@@ -241,7 +241,7 @@ const validateParameters = (studyType, grades, limit, mode) => {
   const isValidGrades =
     Array.isArray(grades) &&
     grades.length > 0 &&
-    grades.every((g) => Number.isInteger(g) && g > 0);
+    grades.every((g) => Number.isInteger(g) && g >= 0);
   const isValidLimit = Number.isInteger(limit) && limit > 0;
 
   const isValidState =
