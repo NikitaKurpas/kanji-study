@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 const Study = () => {
   const navigate = useNavigate();
-  const [selectedGrades, setSelectedGrades] = useState([1, 2]);
-  const [limit, setLimit] = useState(10);
+  const [selectedGrades, setSelectedGrades] = useState([0, 1, 2]);
+  const [limit, setLimit] = useState(20);
   const [mode, setMode] = useState('meaning-to-kanji');
   const [studyType, setStudyType] = useState('kanji');
   const [loading, setLoading] = useState(false);
@@ -12,8 +12,8 @@ const Study = () => {
 
   useEffect(() => {
     if (studyType === 'kanji') {
-      setSelectedGrades([1, 2]);
-      setLimit(10);
+      setSelectedGrades([0, 1, 2]);
+      setLimit(20);
       setMode('meaning-to-kanji');
     } else if (studyType === 'words') {
       setSelectedGrades([]);
