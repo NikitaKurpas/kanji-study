@@ -25,8 +25,10 @@ const getWordsForReview = (limit, mode) => {
   return new Promise((resolve, reject) => {
     // We prioritize words with lower levels and those that haven't been reviewed recently
     // We use a weighted random selection influenced by the level
+    // Only include enabled words for review
     const query = `
       SELECT * FROM words
+      WHERE enabled = 1
       ORDER BY 
         (level * 2) - 
         (CASE 
@@ -146,6 +148,39 @@ const getWordStats = () => {
   });
 };
 
+// Toggle word enabled status
+const toggleWordEnabled = (wordId) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      'UPDATE words SET enabled = 1 - enabled WHERE id = ?',
+      [wordId],
+      function(err) {
+        if (err) return reject(err);
+        if (this.changes === 0) return reject(new Error('Word not found'));
+        
+        // Get the updated word to return the new enabled status
+        db.get('SELECT * FROM words WHERE id = ?', [wordId], (err, row) => {
+          if (err) return reject(err);
+          resolve(row);
+        });
+      }
+    );
+  });
+};
+
+// Bulk enable/disable words based on IDs
+const bulkSetWordsEnabled = (wordIds, enabled) => {
+  return new Promise((resolve, reject) => {
+    const placeholders = wordIds.map(() => '?').join(',');
+    const query = `UPDATE words SET enabled = ? WHERE id IN (${placeholders})`;
+    
+    db.run(query, [enabled ? 1 : 0, ...wordIds], function(err) {
+      if (err) return reject(err);
+      resolve({ changes: this.changes });
+    });
+  });
+};
+
 module.exports = {
   getAllWords,
   getWordById,
@@ -153,5 +188,7 @@ module.exports = {
   addWord,
   updateWord,
   updateWordLevel,
-  getWordStats
+  getWordStats,
+  toggleWordEnabled,
+  bulkSetWordsEnabled
 };

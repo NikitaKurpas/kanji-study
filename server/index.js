@@ -71,6 +71,39 @@ app.post('/api/kanji/update-level', async (req, res) => {
   }
 });
 
+// Toggle kanji enabled status
+app.post('/api/kanji/:id/toggle-enabled', async (req, res) => {
+  try {
+    const kanjiId = parseInt(req.params.id);
+    if (isNaN(kanjiId)) {
+      return res.status(400).json({ error: 'Invalid kanji ID' });
+    }
+    
+    const result = await kanjiRepository.toggleKanjiEnabled(kanjiId);
+    res.json(result);
+  } catch (error) {
+    console.error('Error toggling kanji enabled status:', error);
+    res.status(500).json({ error: 'Failed to toggle kanji enabled status' });
+  }
+});
+
+// Bulk enable/disable kanji
+app.post('/api/kanji/bulk-set-enabled', async (req, res) => {
+  try {
+    const { kanjiIds, enabled } = req.body;
+    
+    if (!Array.isArray(kanjiIds) || enabled === undefined) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
+    
+    const result = await kanjiRepository.bulkSetKanjiEnabled(kanjiIds, enabled);
+    res.json(result);
+  } catch (error) {
+    console.error('Error bulk setting kanji enabled status:', error);
+    res.status(500).json({ error: 'Failed to bulk set kanji enabled status' });
+  }
+});
+
 // Get kanji stats
 app.get('/api/stats/kanji', async (req, res) => {
   try {
@@ -176,6 +209,39 @@ app.post('/api/words/update-level', async (req, res) => {
   } catch (error) {
     console.error('Error updating word level:', error);
     res.status(500).json({ error: 'Failed to update word level' });
+  }
+});
+
+// Toggle word enabled status
+app.post('/api/words/:id/toggle-enabled', async (req, res) => {
+  try {
+    const wordId = parseInt(req.params.id);
+    if (isNaN(wordId)) {
+      return res.status(400).json({ error: 'Invalid word ID' });
+    }
+    
+    const result = await wordRepository.toggleWordEnabled(wordId);
+    res.json(result);
+  } catch (error) {
+    console.error('Error toggling word enabled status:', error);
+    res.status(500).json({ error: 'Failed to toggle word enabled status' });
+  }
+});
+
+// Bulk enable/disable words
+app.post('/api/words/bulk-set-enabled', async (req, res) => {
+  try {
+    const { wordIds, enabled } = req.body;
+    
+    if (!Array.isArray(wordIds) || enabled === undefined) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
+    
+    const result = await wordRepository.bulkSetWordsEnabled(wordIds, enabled);
+    res.json(result);
+  } catch (error) {
+    console.error('Error bulk setting words enabled status:', error);
+    res.status(500).json({ error: 'Failed to bulk set words enabled status' });
   }
 });
 

@@ -8,6 +8,7 @@ const WordList = () => {
   const [filter, setFilter] = useState('all');
   const [reviewFilter, setReviewFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [toggleLoading, setToggleLoading] = useState(new Set());
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -100,6 +101,69 @@ const WordList = () => {
   const handleEditWord = (wordId) => {
     navigate(`/words/edit/${wordId}`);
   };
+
+  const toggleWordEnabled = async (wordId, event) => {
+    event.stopPropagation(); // Prevent navigation to edit page
+    setToggleLoading(prev => new Set(prev).add(wordId));
+    
+    try {
+      const response = await fetch(`/api/words/${wordId}/toggle-enabled`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to toggle word status');
+      }
+      
+      const updatedWord = await response.json();
+      
+      // Update the word list with the new enabled status
+      setWordList(prev => prev.map(word => 
+        word.id === wordId ? updatedWord : word
+      ));
+    } catch (error) {
+      console.error('Error toggling word status:', error);
+      setError(error.message);
+    } finally {
+      setToggleLoading(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(wordId);
+        return newSet;
+      });
+    }
+  };
+
+  const bulkSetEnabled = async (enabled) => {
+    const filteredIds = filterWords().map(word => word.id);
+    
+    try {
+      const response = await fetch('/api/words/bulk-set-enabled', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          wordIds: filteredIds,
+          enabled: enabled
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to bulk update word status');
+      }
+      
+      // Update the word list with the new enabled status
+      setWordList(prev => prev.map(word => 
+        filteredIds.includes(word.id) ? { ...word, enabled: enabled ? 1 : 0 } : word
+      ));
+    } catch (error) {
+      console.error('Error bulk updating word status:', error);
+      setError(error.message);
+    }
+  };
   
   if (loading) {
     return <div className="loading">Loading word list...</div>;
@@ -166,13 +230,32 @@ const WordList = () => {
         </div>
         
         <div>
-          <p>Showing {filteredWords.length} words</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <p>Showing {filteredWords.length} words</p>
+            <div>
+              <button 
+                onClick={() => bulkSetEnabled(true)}
+                className="success"
+                style={{ marginRight: '0.5rem' }}
+                disabled={filteredWords.length === 0}
+              >
+                Enable All Filtered
+              </button>
+              <button 
+                onClick={() => bulkSetEnabled(false)}
+                className="warning"
+                disabled={filteredWords.length === 0}
+              >
+                Disable All Filtered
+              </button>
+            </div>
+          </div>
           
           <div className="word-grid">
             {filteredWords.map(word => (
               <div 
                 key={word.id} 
-                className="word-item" 
+                className={`word-item ${word.enabled === 0 ? 'disabled' : ''}`}
                 onClick={() => handleEditWord(word.id)}
                 style={{ cursor: 'pointer' }}
               >
@@ -187,6 +270,14 @@ const WordList = () => {
                     />
                   ))}
                 </div>
+                <button
+                  onClick={(e) => toggleWordEnabled(word.id, e)}
+                  className={`toggle ${word.enabled ? 'enabled' : 'disabled'}`}
+                  disabled={toggleLoading.has(word.id)}
+                  title={word.enabled ? 'Disable for reviews' : 'Enable for reviews'}
+                >
+                  {toggleLoading.has(word.id) ? '...' : (word.enabled ? '✓' : '✗')}
+                </button>
               </div>
             ))}
           </div>

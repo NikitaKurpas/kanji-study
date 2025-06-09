@@ -30,9 +30,10 @@ const getKanjiForReview = (grades, limit, mode) => {
 
     // We prioritize kanji with lower levels and those that haven't been reviewed recently
     // We use a weighted random selection influenced by the level
+    // Only include enabled kanji for review
     const query = `
       SELECT * FROM kanji
-      WHERE grade IN (${placeholders})
+      WHERE grade IN (${placeholders}) AND enabled = 1
       ORDER BY 
         (level * 2) - 
         (CASE 
@@ -122,10 +123,45 @@ const getKanjiStats = () => {
   });
 };
 
+// Toggle kanji enabled status
+const toggleKanjiEnabled = (kanjiId) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      'UPDATE kanji SET enabled = 1 - enabled WHERE id = ?',
+      [kanjiId],
+      function(err) {
+        if (err) return reject(err);
+        if (this.changes === 0) return reject(new Error('Kanji not found'));
+        
+        // Get the updated kanji to return the new enabled status
+        db.get('SELECT * FROM kanji WHERE id = ?', [kanjiId], (err, row) => {
+          if (err) return reject(err);
+          resolve(row);
+        });
+      }
+    );
+  });
+};
+
+// Bulk enable/disable kanji based on IDs
+const bulkSetKanjiEnabled = (kanjiIds, enabled) => {
+  return new Promise((resolve, reject) => {
+    const placeholders = kanjiIds.map(() => '?').join(',');
+    const query = `UPDATE kanji SET enabled = ? WHERE id IN (${placeholders})`;
+    
+    db.run(query, [enabled ? 1 : 0, ...kanjiIds], function(err) {
+      if (err) return reject(err);
+      resolve({ changes: this.changes });
+    });
+  });
+};
+
 module.exports = {
   getAllKanji,
   getKanjiByGrades,
   getKanjiForReview,
   updateKanjiLevel,
-  getKanjiStats
+  getKanjiStats,
+  toggleKanjiEnabled,
+  bulkSetKanjiEnabled
 };

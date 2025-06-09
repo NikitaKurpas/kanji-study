@@ -17,7 +17,8 @@ const initDB = () => {
         grade INTEGER NOT NULL, -- The school grade the kanji is typically taught in
         level INTEGER DEFAULT 0,
         last_reviewed TIMESTAMP,
-        review_count INTEGER DEFAULT 0
+        review_count INTEGER DEFAULT 0,
+        enabled INTEGER DEFAULT 1 -- 1 for enabled, 0 for disabled
       )
     `);
 
@@ -30,7 +31,8 @@ const initDB = () => {
         meaning TEXT NOT NULL,
         level INTEGER DEFAULT 0,
         last_reviewed TIMESTAMP,
-        review_count INTEGER DEFAULT 0
+        review_count INTEGER DEFAULT 0,
+        enabled INTEGER DEFAULT 1 -- 1 for enabled, 0 for disabled
       )
     `);
 
@@ -55,6 +57,19 @@ const initDB = () => {
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Migration: Add enabled column to existing tables if it doesn't exist
+    db.all("PRAGMA table_info(kanji)", (err, columns) => {
+      if (!err && !columns.find(col => col.name === 'enabled')) {
+        db.run('ALTER TABLE kanji ADD COLUMN enabled INTEGER DEFAULT 1');
+      }
+    });
+
+    db.all("PRAGMA table_info(words)", (err, columns) => {
+      if (!err && !columns.find(col => col.name === 'enabled')) {
+        db.run('ALTER TABLE words ADD COLUMN enabled INTEGER DEFAULT 1');
+      }
+    });
   });
 };
 

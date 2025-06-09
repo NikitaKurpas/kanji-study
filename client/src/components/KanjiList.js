@@ -7,6 +7,7 @@ const KanjiList = () => {
   const [filter, setFilter] = useState('all');
   const [reviewFilter, setReviewFilter] = useState('all');
   const [selectedGrades, setSelectedGrades] = useState([0, 1, 2, 3, 4, 5]);
+  const [toggleLoading, setToggleLoading] = useState(new Set());
   
   useEffect(() => {
     const fetchKanji = async () => {
@@ -34,6 +35,68 @@ const KanjiList = () => {
       setSelectedGrades(selectedGrades.filter(g => g !== grade));
     } else {
       setSelectedGrades([...selectedGrades, grade]);
+    }
+  };
+
+  const toggleKanjiEnabled = async (kanjiId) => {
+    setToggleLoading(prev => new Set(prev).add(kanjiId));
+    
+    try {
+      const response = await fetch(`/api/kanji/${kanjiId}/toggle-enabled`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to toggle kanji status');
+      }
+      
+      const updatedKanji = await response.json();
+      
+      // Update the kanji list with the new enabled status
+      setKanjiList(prev => prev.map(kanji => 
+        kanji.id === kanjiId ? updatedKanji : kanji
+      ));
+    } catch (error) {
+      console.error('Error toggling kanji status:', error);
+      setError(error.message);
+    } finally {
+      setToggleLoading(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(kanjiId);
+        return newSet;
+      });
+    }
+  };
+
+  const bulkSetEnabled = async (enabled) => {
+    const filteredIds = filterKanji().map(kanji => kanji.id);
+    
+    try {
+      const response = await fetch('/api/kanji/bulk-set-enabled', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          kanjiIds: filteredIds,
+          enabled: enabled
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to bulk update kanji status');
+      }
+      
+      // Update the kanji list with the new enabled status
+      setKanjiList(prev => prev.map(kanji => 
+        filteredIds.includes(kanji.id) ? { ...kanji, enabled: enabled ? 1 : 0 } : kanji
+      ));
+    } catch (error) {
+      console.error('Error bulk updating kanji status:', error);
+      setError(error.message);
     }
   };
   
@@ -174,11 +237,30 @@ const KanjiList = () => {
         </div>
         
         <div>
-          <p>Showing {filteredKanji.length} characters</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <p>Showing {filteredKanji.length} characters</p>
+            <div>
+              <button 
+                onClick={() => bulkSetEnabled(true)}
+                className="success"
+                style={{ marginRight: '0.5rem' }}
+                disabled={filteredKanji.length === 0}
+              >
+                Enable All Filtered
+              </button>
+              <button 
+                onClick={() => bulkSetEnabled(false)}
+                className="warning"
+                disabled={filteredKanji.length === 0}
+              >
+                Disable All Filtered
+              </button>
+            </div>
+          </div>
           
           <div className="kanji-grid">
             {filteredKanji.map(kanji => (
-              <div key={kanji.id} className="kanji-item">
+              <div key={kanji.id} className={`kanji-item ${kanji.enabled === 0 ? 'disabled' : ''}`}>
                 <div className="character">{kanji.character}</div>
                 <div className="meaning">{kanji.meaning}</div>
                 <div className="grade">{kanji.grade === 0 ? 'Kana' : `Grade ${kanji.grade}`}</div>
@@ -190,6 +272,14 @@ const KanjiList = () => {
                     />
                   ))}
                 </div>
+                <button
+                  onClick={() => toggleKanjiEnabled(kanji.id)}
+                  className={`toggle ${kanji.enabled ? 'enabled' : 'disabled'}`}
+                  disabled={toggleLoading.has(kanji.id)}
+                  title={kanji.enabled ? 'Disable for reviews' : 'Enable for reviews'}
+                >
+                  {toggleLoading.has(kanji.id) ? '...' : (kanji.enabled ? '✓' : '✗')}
+                </button>
               </div>
             ))}
           </div>
