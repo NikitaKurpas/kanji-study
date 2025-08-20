@@ -107,7 +107,7 @@ const words = [
     { w: "休む", r: "やすむ", m: "to rest, take a break" },
     { w: "働く", r: "はたらく", m: "to work" },
     { w: "乗る", r: "のる", m: "to ride (a vehicle)" },
-    { w: "通う", r: "かよう", m: "to commute" },
+    { w: "通う", r: "かよう", m: "to commute, to attend" },
     { w: "通学", r: "つうがく", m: "commuting to school" },
     { w: "通る", r: "とおる", m: "to pass, go through" },
     { w: "船", r: "ふね", m: "boat" },
