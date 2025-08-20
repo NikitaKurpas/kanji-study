@@ -10,6 +10,7 @@ import WordList from './components/WordList';
 import WordForm from './components/WordForm';
 import Stats from './components/Stats';
 import Results from './components/Results';
+import Settings from './components/Settings';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <li><Link to="/kanji">Kanji List</Link></li>
           <li><Link to="/words">Words List</Link></li>
           <li><Link to="/stats">Stats</Link></li>
+          <li><Link to="/settings">Settings</Link></li>
         </ul>
       </nav>
       
@@ -39,6 +41,7 @@ function App() {
           <Route path="/words/edit/:id" element={<WordForm />} />
           <Route path="/stats" element={<Stats />} />
           <Route path="/results" element={<Results />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </main>
     </div>

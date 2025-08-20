@@ -272,6 +272,23 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
+// Reset all review stats
+app.post('/api/reset-stats', async (req, res) => {
+  try {
+    const kanjiResult = await kanjiRepository.resetKanjiStats();
+    const wordResult = await wordRepository.resetWordStats();
+    
+    res.json({
+      message: 'Review statistics reset successfully',
+      kanjiChanged: kanjiResult.changes,
+      wordsChanged: wordResult.changes
+    });
+  } catch (error) {
+    console.error('Error resetting stats:', error);
+    res.status(500).json({ error: 'Failed to reset stats' });
+  }
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

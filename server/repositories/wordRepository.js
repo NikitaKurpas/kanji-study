@@ -181,6 +181,44 @@ const bulkSetWordsEnabled = (wordIds, enabled) => {
   });
 };
 
+// Reset all word review stats
+const resetWordStats = () => {
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      db.run('BEGIN TRANSACTION');
+      
+      // Reset word stats
+      db.run(
+        'UPDATE words SET level = 0, last_reviewed = NULL, review_count = 0',
+        [],
+        function(err) {
+          if (err) {
+            db.run('ROLLBACK');
+            return reject(err);
+          }
+        }
+      );
+      
+      // Clear word review history
+      db.run(
+        "DELETE FROM review_history WHERE item_type = 'word'",
+        [],
+        function(err) {
+          if (err) {
+            db.run('ROLLBACK');
+            return reject(err);
+          }
+          
+          db.run('COMMIT', (err) => {
+            if (err) return reject(err);
+            resolve({ changes: this.changes });
+          });
+        }
+      );
+    });
+  });
+};
+
 module.exports = {
   getAllWords,
   getWordById,
@@ -190,5 +228,6 @@ module.exports = {
   updateWordLevel,
   getWordStats,
   toggleWordEnabled,
-  bulkSetWordsEnabled
+  bulkSetWordsEnabled,
+  resetWordStats
 };

@@ -156,6 +156,44 @@ const bulkSetKanjiEnabled = (kanjiIds, enabled) => {
   });
 };
 
+// Reset all kanji review stats
+const resetKanjiStats = () => {
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      db.run('BEGIN TRANSACTION');
+      
+      // Reset kanji stats
+      db.run(
+        'UPDATE kanji SET level = 0, last_reviewed = NULL, review_count = 0',
+        [],
+        function(err) {
+          if (err) {
+            db.run('ROLLBACK');
+            return reject(err);
+          }
+        }
+      );
+      
+      // Clear kanji review history
+      db.run(
+        "DELETE FROM review_history WHERE item_type = 'kanji'",
+        [],
+        function(err) {
+          if (err) {
+            db.run('ROLLBACK');
+            return reject(err);
+          }
+          
+          db.run('COMMIT', (err) => {
+            if (err) return reject(err);
+            resolve({ changes: this.changes });
+          });
+        }
+      );
+    });
+  });
+};
+
 module.exports = {
   getAllKanji,
   getKanjiByGrades,
@@ -163,5 +201,6 @@ module.exports = {
   updateKanjiLevel,
   getKanjiStats,
   toggleKanjiEnabled,
-  bulkSetKanjiEnabled
+  bulkSetKanjiEnabled,
+  resetKanjiStats
 };
